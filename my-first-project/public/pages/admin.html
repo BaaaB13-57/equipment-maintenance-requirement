@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Equipment Maintenance System</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/departments.css">
+</head>
+<body>
+    <div class="dashboard-app">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-brand"><div class="brand-icon">AD</div><div class="brand-text"><h2>MineKeep</h2><p>Maintenance System</p></div></div>
+            <nav class="sidebar-menu">
+                <a href="#allRequests" class="sidebar-link active" data-admin-section-link="allRequests"><span class="sidebar-icon">RQ</span><span>All Requests</span></a>
+                <a href="#adminReview" class="sidebar-link" data-admin-section-link="adminReview"><span class="sidebar-icon">RV</span><span>Review Work</span></a>
+                <a href="#assignTechnicians" class="sidebar-link" data-admin-section-link="assignTechnicians"><span class="sidebar-icon">OP</span><span>Open Jobs</span></a>
+                <a href="#manageEquipment" class="sidebar-link" data-admin-section-link="manageEquipment"><span class="sidebar-icon">EQ</span><span>Equipment</span></a>
+                <a href="#manageUsers" class="sidebar-link" data-admin-section-link="manageUsers"><span class="sidebar-icon">US</span><span>Users</span></a>
+                <a href="#reports" class="sidebar-link" data-admin-section-link="reports"><span class="sidebar-icon">RP</span><span>Reports</span></a>
+            </nav>
+            <button class="sidebar-logout" id="logoutBtn"><span class="sidebar-icon">LO</span><span>Logout</span></button>
+        </aside>
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div><h1>Admin Dashboard</h1><p class="dashboard-subtitle">Review requests, approve work, assign technicians, manage equipment and users, and view performance reports.</p></div>
+                <div class="header-tools admin-header-tools">
+                    <button type="button" class="user-menu-button active" data-admin-section="allRequests">All Requests</button>
+                    <button type="button" class="user-menu-button" data-admin-section="adminReview">Review Work</button>
+                    <button type="button" class="user-menu-button" data-admin-section="assignTechnicians">Open Jobs</button>
+                    <button type="button" class="user-menu-button" data-admin-section="manageEquipment">Equipment</button>
+                    <button type="button" class="user-menu-button" data-admin-section="manageUsers">Users</button>
+                    <button type="button" class="user-menu-button" data-admin-section="reports">Reports</button>
+                </div>
+            </header>
+
+            <section class="stats-grid admin-summary" aria-label="Admin summary">
+                <article class="stat-card stat-pending"><div class="stat-card-icon">PN</div><div class="stat-card-body"><h3 class="stat-card-title">Pending Approval</h3><p class="stat-card-value" id="adminPendingCount">3</p><span class="stat-card-note">Requests waiting for admin action</span></div></article>
+                <article class="stat-card stat-equipment"><div class="stat-card-icon">OP</div><div class="stat-card-body"><h3 class="stat-card-title">Open Jobs</h3><p class="stat-card-value" id="adminAssignedCount">2</p><span class="stat-card-note">Requests not completed yet</span></div></article>
+                <article class="stat-card stat-completed"><div class="stat-card-icon">EQ</div><div class="stat-card-body"><h3 class="stat-card-title">Equipment</h3><p class="stat-card-value" id="adminEquipmentCount">0</p><span class="stat-card-note">Registered assets</span></div></article>
+                <article class="stat-card stat-users"><div class="stat-card-icon">US</div><div class="stat-card-body"><h3 class="stat-card-title">Users</h3><p class="stat-card-value" id="adminUserCount">0</p><span class="stat-card-note">Active accounts</span></div></article>
+            </section>
+
+            <section class="operations-request-panel admin-dashboard-section active" id="allRequests" aria-label="All maintenance requests">
+                <div class="panel-head"><h2>All Requests</h2><span class="notification-badge" id="adminReviewBadge">Admin Review</span></div>
+                <div class="table-wrapper">
+                    <table class="data-table admin-table">
+                        <thead><tr><th>Request</th><th>User</th><th>Equipment</th><th>Priority</th><th>Status</th><th>Admin Action</th></tr></thead>
+                        <tbody id="adminRequestsBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="operations-request-panel admin-dashboard-section" id="adminReview" aria-label="Admin review work">
+                <div class="panel-head">
+                    <h2>Admin Review Work</h2>
+                    <select id="adminReviewSelect" class="user-dashboard-select" aria-label="Select request to review"></select>
+                </div>
+                <div class="technician-detail-panel" id="adminReviewPanel"></div>
+            </section>
+
+            <section class="operations-request-panel admin-dashboard-section" id="assignTechnicians" aria-label="Open jobs">
+                <div class="panel-head"><h2>Open Jobs</h2><span class="maintenance-count" id="openJobsCount">0 open</span></div>
+                <div class="maintenance-work-list" id="assignmentList"></div>
+            </section>
+
+            <section class="operations-request-panel admin-dashboard-section" id="manageEquipment" aria-label="Manage equipment">
+                <div class="panel-head"><h2>Manage Equipment</h2><button type="button" class="view-all-button" id="addEquipmentBtn">Add Equipment</button></div>
+                <form class="operations-request-form hidden admin-add-equipment-form" id="addEquipmentForm">
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="equipmentAssetId">Asset ID</label>
+                            <input id="equipmentAssetId" type="text" placeholder="Example: EQ-2026-006" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="equipmentName">Equipment Name</label>
+                            <input id="equipmentName" type="text" placeholder="Example: Loader #02" required>
+                        </div>
+                    </div>
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="equipmentType">Equipment Type</label>
+                            <input id="equipmentType" type="text" placeholder="Example: Hauling, Drilling, Processing" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="equipmentLocation">Location</label>
+                            <input id="equipmentLocation" type="text" placeholder="Example: Zone A - Pit 1" required>
+                        </div>
+                    </div>
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="equipmentStatus">Status</label>
+                            <select id="equipmentStatus">
+                                <option value="operational">Operational</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="idle">Idle</option>
+                                <option value="down">Down</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="equipmentAssignedTo">Assigned Technician</label>
+                            <select id="equipmentAssignedTo">
+                                <option>Unassigned</option>
+                                <option>Technician Account</option>
+                                <option>Abebe Mekonnen</option>
+                                <option>Sara Tesfaye</option>
+                                <option>Daniel Worku</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentNotes">Notes</label>
+                        <textarea id="equipmentNotes" rows="3" placeholder="Add equipment notes or service information."></textarea>
+                    </div>
+                    <div class="equipment-form-actions">
+                        <button type="submit" class="btn btn-primary">Save Equipment</button>
+                        <button type="button" class="btn btn-cancel" id="cancelAddEquipmentBtn">Cancel</button>
+                    </div>
+                </form>
+                <div class="table-wrapper">
+                    <table class="data-table admin-table">
+                        <thead><tr><th>Equipment</th><th>Location</th><th>Status</th><th>Last Service</th><th>Action</th></tr></thead>
+                        <tbody id="adminEquipmentBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="operations-request-panel admin-dashboard-section" id="manageUsers" aria-label="Manage users">
+                <div class="panel-head"><h2>Manage Users</h2><button type="button" class="view-all-button" id="addUserBtn">Add User</button></div>
+                <form class="operations-request-form hidden admin-add-user-form" id="addUserForm">
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="newUserName">Full Name</label>
+                            <input id="newUserName" type="text" placeholder="Example: Alemu Bekele" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserEmail">Email</label>
+                            <input id="newUserEmail" type="email" placeholder="Example: user@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="newUsername">Username</label>
+                            <input id="newUsername" type="text" placeholder="Example: alemu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserPassword">Password</label>
+                            <input id="newUserPassword" type="password" placeholder="Create password" required>
+                        </div>
+                    </div>
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="newUserRole">Role</label>
+                            <select id="newUserRole">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                                <option value="technician">Technician</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserDepartment">Department</label>
+                            <input id="newUserDepartment" type="text" placeholder="Example: Operations" value="Operations">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserPhone">Phone</label>
+                        <input id="newUserPhone" type="tel" placeholder="Optional phone number">
+                    </div>
+                    <div class="equipment-form-actions">
+                        <button type="submit" class="btn btn-primary">Save User</button>
+                        <button type="button" class="btn btn-cancel" id="cancelAddUserBtn">Cancel</button>
+                    </div>
+                </form>
+                <div class="table-wrapper">
+                    <table class="data-table admin-table">
+                        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="adminUsersBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="operations-request-panel admin-dashboard-section" id="reports" aria-label="Reports">
+                <div class="panel-head"><h2>Reports</h2><button type="button" class="view-all-button" id="downloadReportBtn">Download Report</button></div>
+                <div class="admin-report-grid">
+                    <article class="admin-report-card"><span>Completion Rate</span><strong>86%</strong><p>Maintenance requests completed this month.</p></article>
+                    <article class="admin-report-card"><span>Average Repair Time</span><strong>1.8 days</strong><p>Average time from approval to close.</p></article>
+                    <article class="admin-report-card"><span>High Priority</span><strong>5</strong><p>Urgent equipment issues still open.</p></article>
+                    <article class="admin-report-card"><span>Downtime Reduced</span><strong>14%</strong><p>Improvement compared with last month.</p></article>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="../js/common.js?v=20260713-system-check"></script>
+    <script src="../js/admin.js?v=20260713-system-check"></script>
+</body>
+</html>

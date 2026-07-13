@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start Equipment Maintenance App",
+            "type": "shell",
+            "command": "npm start",
+            "options": {
+                "cwd": "${workspaceFolder}/my-first-project"
+            },
+            "problemMatcher": [],
+            "isBackground": true
+        }
+    ]
+}

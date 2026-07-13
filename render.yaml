@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: equipment-maintenance-system
+    env: node
+    rootDir: my-first-project
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false

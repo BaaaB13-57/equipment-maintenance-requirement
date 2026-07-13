@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Open Login Page",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost:3000/pages/login.html",
+            "preLaunchTask": "Start Equipment Maintenance App",
+            "webRoot": "${workspaceFolder}/my-first-project/public"
+        }
+    ]
+}

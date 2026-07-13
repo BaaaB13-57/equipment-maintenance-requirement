@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Equipment Maintenance System</title>
+    <link rel="stylesheet" href="../css/common.css?v=20260713-new-users">
+    <link rel="stylesheet" href="../css/login.css?v=20260713-new-users">
+</head>
+<body>
+    <main class="login-container">
+        <section class="login-brand" aria-label="System information">
+            <div class="brand-content">
+                <h1 class="brand-title">MineKeep</h1>
+                <p class="brand-subtitle">Equipment maintenance requests, approvals, assignments, and repair tracking in one place.</p>
+
+                <div class="brand-features" aria-label="Dashboard roles">
+                    <div class="feature">
+                        <span class="feature-icon">U</span>
+                        <span>User dashboard for sending and tracking requests</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">A</span>
+                        <span>Admin dashboard for approvals and assignments</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">T</span>
+                        <span>Technician dashboard for repairs and completion</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="login-form-container">
+            <div class="login-form-wrapper">
+                <div class="mobile-brand">
+                    <h1 class="brand-title">MineKeep</h1>
+                    <p class="brand-subtitle">Equipment Maintenance System</p>
+                </div>
+
+                <h2>Sign in</h2>
+                <p>Use your account to open the correct dashboard.</p>
+
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Username or Email</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon" aria-hidden="true">@</span>
+                            <input type="text" id="email" name="email" placeholder="admin, user, or technician" autocomplete="username" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon" aria-hidden="true">*</span>
+                            <input type="password" id="password" name="password" placeholder="Enter password" autocomplete="current-password" required>
+                            <button class="toggle-password" id="togglePassword" type="button" aria-label="Show or hide password">Show</button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span>Remember me</span>
+                        </label>
+                    </div>
+
+                    <button class="login-btn" type="submit">Sign in</button>
+                </form>
+
+                <div class="login-divider">
+                    <span>Demo accounts</span>
+                </div>
+
+                <div class="demo-login-grid">
+                    <button class="demo-login-btn" type="button" data-email="user" data-password="demo123">User Dashboard</button>
+                    <button class="demo-login-btn" type="button" data-email="admin" data-password="demo123">Admin Dashboard</button>
+                    <button class="demo-login-btn" type="button" data-email="technician" data-password="demo123">Technician Dashboard</button>
+                </div>
+
+                <p class="demo-login-hint">Password for all demo accounts: demo123</p>
+            </div>
+
+            <div class="login-info">
+                <p>One login system opens the correct dashboard based on role.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/common.js?v=20260713-system-check"></script>
+    <script src="../js/login.js?v=20260713-system-check"></script>
+</body>
+</html>
