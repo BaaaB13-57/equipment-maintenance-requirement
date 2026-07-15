@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technician Dashboard - Equipment Maintenance System</title>
+    <link rel="stylesheet" href="../css/common.css?v=20260714-popup-ui">
+    <link rel="stylesheet" href="../css/dashboard.css?v=20260715-user-color-theme">
+    <link rel="stylesheet" href="../css/departments.css?v=20260714-dashboard">
+</head>
+<body class="user-color-theme">
+    <div class="dashboard-app">
+        <button type="button" class="sidebar-toggle" aria-label="Open navigation menu" aria-controls="dashboardSidebar" aria-expanded="false"><span></span><span></span><span></span></button>
+        <div class="sidebar-backdrop" aria-hidden="true"></div>
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-brand"><div class="brand-icon" aria-hidden="true">🔧</div><div class="brand-text"><h2>MineKeep</h2><p>Maintenance System</p></div></div>
+            <nav class="sidebar-menu">
+                <a href="#dashboard" class="sidebar-link active" data-technician-section-link="dashboard"><span class="sidebar-icon" aria-hidden="true">▦</span><span>Dashboard</span></a>
+                <a href="#assignedRequests" class="sidebar-link" data-technician-section-link="assignedRequests"><span class="sidebar-icon" aria-hidden="true">▤</span><span>Assigned Requests</span></a>
+                <a href="#repairWork" class="sidebar-link" data-technician-section-link="repairWork"><span class="sidebar-icon" aria-hidden="true">⚒</span><span>Repair Work</span></a>
+                <a href="#completedWork" class="sidebar-link" data-technician-section-link="completedWork"><span class="sidebar-icon" aria-hidden="true">✓</span><span>Completed</span></a>
+            </nav>
+            <button class="sidebar-logout" id="logoutBtn"><span class="sidebar-icon" aria-hidden="true">↪</span><span>Logout</span></button>
+        </aside>
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div><h1>Technician Dashboard</h1><p class="dashboard-subtitle">View assigned work, inspect problem details, repair equipment, add notes, update status, and close completed jobs.</p></div>
+                <div class="header-tools technician-header-tools">
+                    <button type="button" class="user-menu-button" data-technician-section="assignedRequests">Assigned Requests</button>
+                    <button type="button" class="user-menu-button" data-technician-section="problemDetails">Problem Details</button>
+                    <button type="button" class="user-menu-button" data-technician-section="repairWork">Repair Equipment</button>
+                    <button type="button" class="user-menu-button" data-technician-section="repairNotes">Technician Message</button>
+                    <button type="button" class="user-menu-button" data-technician-section="completedWork">Completed</button>
+                </div>
+            </header>
+
+            <section class="stats-grid operations-summary technician-dashboard-section active" id="dashboard" aria-label="Technician dashboard summary">
+                <article class="stat-card stat-pending"><div class="stat-card-icon">NEW</div><div class="stat-card-body"><h3 class="stat-card-title">Queue</h3><p class="stat-card-value" id="assignedCount">0</p><span class="stat-card-note">Jobs waiting for technician action</span></div></article>
+                <article class="stat-card stat-equipment"><div class="stat-card-icon">RUN</div><div class="stat-card-body"><h3 class="stat-card-title">In Progress</h3><p class="stat-card-value" id="progressCount">1</p><span class="stat-card-note">Repairs currently underway</span></div></article>
+                <article class="stat-card stat-completed"><div class="stat-card-icon">OK</div><div class="stat-card-body"><h3 class="stat-card-title">Completed</h3><p class="stat-card-value" id="completedCount">1</p><span class="stat-card-note">Work closed by technician</span></div></article>
+            </section>
+
+            <section class="operations-request-panel technician-dashboard-section" id="assignedRequests" aria-label="Assigned maintenance requests">
+                <div class="panel-head">
+                    <h2>Assigned Maintenance Requests</h2>
+                    <div class="equipment-form-actions">
+                        <button type="button" class="view-all-button" id="refreshTechnicianQueueBtn">Refresh Queue</button>
+                        <span class="notification-badge" id="technicianQueueBadge">Technician Queue</span>
+                    </div>
+                </div>
+                <div class="maintenance-work-list" id="technicianRequestList"></div>
+            </section>
+
+            <section class="operations-request-panel technician-dashboard-section" id="problemDetails" aria-label="Problem details">
+                <div class="panel-head">
+                    <h2>Problem Details</h2>
+                    <select id="technicianRequestSelect" class="user-dashboard-select" aria-label="Select assigned request"></select>
+                </div>
+                <div class="technician-detail-panel" id="technicianDetailPanel"></div>
+            </section>
+
+            <section class="operations-request-panel technician-dashboard-section" id="repairWork" aria-label="Repair equipment">
+                <div class="panel-head"><h2>Repair Equipment</h2><span class="maintenance-count" id="activeRepairCode">Select a job</span></div>
+                <form class="operations-request-form" id="repairWorkForm">
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="repairStatus">Update Status</label>
+                            <select id="repairStatus">
+                                <option value="approved">Approved</option>
+                                <option value="assigned">Assigned</option>
+                                <option value="inspection">Inspection</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="testing">Testing</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="partsUsed">Parts Used</label>
+                            <input id="partsUsed" type="text" placeholder="Example: hydraulic seal, drive belt">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="repairAction">Repair Action</label>
+                        <textarea id="repairAction" rows="4" placeholder="Describe inspection, repair steps, testing, and safety checks."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="repairPhoto">Photo of Repaired Equipment</label>
+                        <input id="repairPhoto" type="file" accept="image/*">
+                        <small>Upload a clear photo after the repair (maximum 2 MB).</small>
+                    </div>
+                    <div class="equipment-form-actions">
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                        <button type="button" class="btn btn-cancel" id="markCompleteBtn">Mark Completed</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="operations-request-panel technician-dashboard-section" id="repairNotes" aria-label="Technician message">
+                <div class="panel-head"><h2>Technician Message</h2><button type="button" class="view-all-button" data-technician-section="repairWork">Back to Repair</button></div>
+                <div class="technician-notes-layout">
+                    <form class="operations-request-form" id="repairNotesForm">
+                        <div class="form-group">
+                            <label for="repairNoteText">Message to User</label>
+                            <textarea id="repairNoteText" rows="5" placeholder="Write a repair update or message for the user."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                    <div class="notification-items" id="repairNotesList"></div>
+                </div>
+            </section>
+
+            <section class="operations-request-panel technician-dashboard-section" id="completedWork" aria-label="Completed work">
+                <div class="panel-head"><h2>Completed Work</h2><span class="notification-badge" id="completedWorkBadge">1 closed</span></div>
+                <div class="table-wrapper">
+                    <table class="data-table admin-table">
+                        <thead><tr><th>Request</th><th>Equipment</th><th>Repair Summary</th><th>Photo</th><th>Completed Date</th></tr></thead>
+                        <tbody id="completedWorkBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="../js/common.js?v=20260715-profile-manage-users-removed"></script>
+    <script src="../js/technicians.js?v=20260715-repair-photo"></script>
+</body>
+</html>

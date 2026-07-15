@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Equipment Maintenance System</title>
+    <link rel="stylesheet" href="../css/common.css?v=20260714-popup-ui">
+    <link rel="stylesheet" href="../css/dashboard.css?v=20260715-full-action-notifications">
+    <link rel="stylesheet" href="../css/departments.css?v=20260714-active-card">
+</head>
+<body>
+    <div class="dashboard-app">
+        <button type="button" class="sidebar-toggle" aria-label="Open navigation menu" aria-controls="dashboardSidebar" aria-expanded="false"><span></span><span></span><span></span></button>
+        <div class="sidebar-backdrop" aria-hidden="true"></div>
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon" aria-hidden="true">⛏</div>
+                <div class="brand-text">
+                    <h2>MineKeep</h2>
+                    <p>Maintenance System</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="#dashboard" class="sidebar-link active" data-user-section-link="dashboard">
+                    <span class="sidebar-icon" aria-hidden="true">▦</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#sendRequest" class="sidebar-link" data-user-section-link="sendRequest">
+                    <span class="sidebar-icon" aria-hidden="true">＋</span>
+                    <span>Send Request</span>
+                </a>
+                <a href="#myRequests" class="sidebar-link" data-user-section-link="myRequests">
+                    <span class="sidebar-icon" aria-hidden="true">▤</span>
+                    <span>My Requests</span>
+                </a>
+            </nav>
+
+            <button class="sidebar-logout" id="logoutBtn">
+                <span class="sidebar-icon" aria-hidden="true">↪</span>
+                <span>Logout</span>
+            </button>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div>
+                    <h1>User Dashboard</h1>
+                    <p class="dashboard-subtitle">Send maintenance requests, track progress, read notifications, and keep your profile updated.</p>
+                </div>
+                <div class="header-tools user-header-tools">
+                    <button type="button" class="user-menu-button" data-user-section="sendRequest">Send Request</button>
+                    <button type="button" class="user-menu-button" data-user-section="myRequests">My Requests</button>
+                </div>
+            </header>
+
+            <section class="user-dashboard-overview user-dashboard-section active" id="dashboard" aria-label="User dashboard overview">
+                <div class="stats-grid operations-summary user-summary-grid">
+                    <article class="stat-card stat-equipment"><div class="stat-card-icon" aria-hidden="true">ALL</div><div class="stat-card-body"><h3 class="stat-card-title">Total Requests</h3><p class="stat-card-value" id="userTotalRequestCount">0</p><span class="stat-card-note">All submitted requests</span></div></article>
+                    <article class="stat-card stat-pending"><div class="stat-card-icon" aria-hidden="true">PN</div><div class="stat-card-body"><h3 class="stat-card-title">Pending</h3><p class="stat-card-value" id="userPendingRequestCount">0</p><span class="stat-card-note">Waiting for review</span></div></article>
+                    <article class="stat-card stat-progress"><div class="stat-card-icon" aria-hidden="true">RUN</div><div class="stat-card-body"><h3 class="stat-card-title">In Progress</h3><p class="stat-card-value" id="userInProgressRequestCount">0</p><span class="stat-card-note">Assigned or under repair</span></div></article>
+                    <article class="stat-card stat-completed"><div class="stat-card-icon" aria-hidden="true">OK</div><div class="stat-card-body"><h3 class="stat-card-title">Completed</h3><p class="stat-card-value" id="userCompletedRequestCount">0</p><span class="stat-card-note">Repairs completed</span></div></article>
+                </div>
+            </section>
+
+            <section class="operations-request-panel user-dashboard-section" id="sendRequest" aria-label="Send maintenance request form">
+                <div class="user-dashboard-welcome send-request-welcome">
+                    <div><span class="dashboard-kicker">Mine operations</span><h2>Report Equipment Maintenance</h2><p>Send equipment problems directly to the maintenance team for review and repair.</p></div>
+                </div>
+                <div class="panel-head">
+                    <h2>Send Problem to Maintenance</h2>
+                </div>
+                <form class="operations-request-form" id="operationsRequestForm">
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="operationEquipment">Damaged Equipment *</label>
+                            <select id="operationEquipment" required>
+                                <option value="">Select equipment</option>
+                                <option value="1">Drill Machine #01</option>
+                                <option value="2">Excavator #05</option>
+                                <option value="3">Crusher Unit #03</option>
+                                <option value="4">Conveyor System #01</option>
+                                <option value="5">Dump Truck #08</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="operationLocation">Problem Location *</label>
+                            <input id="operationLocation" type="text" placeholder="Example: Zone B - Pit 2" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row-grid">
+                        <div class="form-group">
+                            <label for="operationUrgency">Urgency *</label>
+                            <select id="operationUrgency" required>
+                                <option value="low">Low - can wait</option>
+                                <option value="medium">Medium - schedule soon</option>
+                                <option value="high">High - needs fast attention</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="operationDate">Requested Date *</label>
+                            <input id="operationDate" type="date" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="operationProblem">Problem Details *</label>
+                        <textarea id="operationProblem" rows="5" placeholder="Describe what happened, what is damaged, and how it affects work..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="equipmentPhoto">Damaged Equipment Photo</label>
+                        <div class="equipment-photo-upload">
+                            <input id="equipmentPhoto" type="file" accept="image/*">
+                            <div class="equipment-photo-preview" id="equipmentPhotoPreview">
+                                <span>No photo selected</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="operations-followup">
+                        <h3>Follow Request Status</h3>
+                        <div class="status-track">
+                            <span class="status-step active">Created</span>
+                            <span class="status-step">Sent to Maintenance</span>
+                            <span class="status-step">Technician Assigned</span>
+                            <span class="status-step">Fixed</span>
+                        </div>
+                    </div>
+
+                    <div class="equipment-form-actions">
+                        <button type="submit" class="btn btn-primary">Send to Maintenance</button>
+                        <button type="button" class="btn btn-cancel" data-user-section="myRequests">View My Requests</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="operations-request-panel user-dashboard-section" id="myRequests" aria-label="My maintenance requests">
+                <div class="panel-head">
+                    <h2>My Requests</h2>
+                    <button type="button" class="view-all-button" data-user-section="sendRequest">New Request</button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table user-requests-table">
+                        <thead>
+                            <tr>
+                                <th>Request</th>
+                                <th>Equipment</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Requested Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userRequestsBody">
+                            <tr>
+                                <td colspan="5" class="table-loading">Loading your requests...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="operations-request-panel user-dashboard-section" id="notifications" aria-label="Notifications">
+                <div class="panel-head">
+                    <h2>Notifications</h2>
+                    <div class="notification-panel-actions">
+                        <span class="notification-badge" id="userNotificationCount">0 unread</span>
+                        <button type="button" class="view-all-button" id="markAllNotificationsRead">Mark all read</button>
+                    </div>
+                </div>
+                <div class="notification-items" id="userNotificationList" aria-live="polite"></div>
+            </section>
+
+
+        </main>
+    </div>
+
+    <script src="../js/common.js?v=20260715-profile-my-requests-removed"></script>
+    <script src="../js/operations.js?v=20260715-full-action-notifications"></script>
+</body>
+</html>
