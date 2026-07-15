@@ -97,6 +97,63 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.user-dashboard-overview { display: none; }
+.user-dashboard-overview.active { display: block; }
+.user-dashboard-welcome { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-bottom: 1.25rem; padding: 1.4rem 1.5rem; border-radius: 1rem; color: #fff; background: linear-gradient(120deg, #17325f, #245590); box-shadow: 0 14px 32px rgba(18, 45, 84, 0.18); }
+.user-dashboard-welcome h2 { margin: 0.15rem 0 0.25rem; font-size: 1.35rem; }
+.user-dashboard-welcome p { margin: 0; color: rgba(255,255,255,0.76); }
+.send-request-welcome { margin: 0; border-radius: 1rem 1rem 0 0; box-shadow: none; }
+.dashboard-kicker { color: #d3a62d; font-size: 0.76rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.new-maintenance-button { flex: 0 0 auto; background: #d3a62d; color: #172c4e; }
+.new-maintenance-button:hover { background: #e1b941; }
+.user-summary-grid { margin-bottom: 1.25rem; }
+.stat-progress { border-left-color: #3498db; }
+.stat-progress .stat-card-icon { color: #2474aa; background: #eaf5fc; }
+.stat-progress .stat-card-value { color: #2474aa; }
+.recent-requests-panel { margin: 0; }
+.recent-requests-table td:first-child strong,
+.recent-requests-table td:first-child small { display: block; }
+.recent-requests-table td:first-child small { margin-top: 0.2rem; color: var(--text-secondary); }
+.request-view-button { padding: 0.5rem 0.8rem; border: 1px solid #c9d8ea; border-radius: 0.55rem; color: #1f3a72; background: #f7faff; cursor: pointer; font-weight: 700; }
+.request-view-button:hover { color: #fff; background: #1f3a72; }
+.status-pill.rejected { color: #b42318; background: #fff0ee; }
+
+/* Colorful user dashboard overview */
+.user-summary-grid .stat-card { position: relative; overflow: hidden; min-height: 140px; border: 0; color: #fff; box-shadow: 0 14px 28px rgba(20, 37, 63, 0.16); }
+.user-summary-grid .stat-card::after { content: ''; position: absolute; right: -28px; bottom: -48px; width: 112px; height: 112px; border: 18px solid rgba(255,255,255,0.12); border-radius: 50%; }
+.user-summary-grid .stat-card-title,
+.user-summary-grid .stat-card-value { color: #fff; }
+.user-summary-grid .stat-card-title,
+.user-summary-grid .stat-card-note { position: relative; z-index: 1; color: rgba(255,255,255,0.82); }
+.user-summary-grid .stat-card-icon { position: relative; z-index: 1; color: #fff; background: rgba(255,255,255,0.2); }
+.user-summary-grid .stat-equipment { background: linear-gradient(135deg, #6554d9, #8b78f2); }
+.user-summary-grid .stat-pending { background: linear-gradient(135deg, #e98216, #f4b52f); }
+.user-summary-grid .stat-progress { background: linear-gradient(135deg, #147fc4, #25b3dc); }
+.user-summary-grid .stat-completed { background: linear-gradient(135deg, #138761, #2abd87); }
+.user-summary-grid .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 36px rgba(20, 37, 63, 0.22); }
+.recent-requests-panel { border: 1px solid #e0e7f1; box-shadow: 0 16px 38px rgba(24,48,81,0.1); }
+.recent-requests-panel .panel-head { background: linear-gradient(90deg, #f8fbff, #eef9f6); }
+.recent-requests-panel .dashboard-kicker { color: #138761; }
+.recent-requests-table thead { background: linear-gradient(90deg, #193965, #216c96); }
+.recent-requests-table th { color: #fff; border-bottom: 0; }
+.recent-requests-table tbody tr:nth-child(even) { background: #f7faff; }
+.recent-requests-table tbody tr:hover { background: #eaf5ff; }
+.request-view-button { border: 0; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #1e65ad, #24a0cc); box-shadow: 0 5px 12px rgba(30,101,173,0.2); }
+.request-view-button:hover { transform: translateY(-1px); background: linear-gradient(135deg, #174f8a, #168ebc); }
+.status-pill.pending { color: #925600; background: #fff0c7; }
+.status-pill.approved,
+.status-pill.assigned,
+.status-pill.inspection,
+.status-pill.in-progress,
+.status-pill.testing { color: #075b91; background: #dff2ff; }
+.status-pill.rejected { color: #b42318; background: #ffe4df; }
+.status-pill.completed { color: #116b4b; background: #d9f7e8; }
+
+@media (max-width: 720px) {
+    .user-dashboard-welcome { align-items: flex-start; flex-direction: column; }
+    .new-maintenance-button { width: 100%; justify-content: center; }
+}
+
 .user-header-tools {
     justify-content: flex-end;
 }
@@ -155,6 +212,29 @@
 .technician-dashboard-section.active {
     display: block;
 }
+
+.stats-grid.user-dashboard-section.active,
+.stats-grid.admin-dashboard-section.active,
+.stats-grid.technician-dashboard-section.active {
+    display: grid;
+}
+
+.admin-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.admin-action-button.danger {
+    border-color: #b42318;
+    color: #b42318;
+}
+
+.admin-action-button.danger:hover {
+    background: #b42318;
+    color: #fff;
+}
+
 
 .technician-card-actions {
     display: grid;

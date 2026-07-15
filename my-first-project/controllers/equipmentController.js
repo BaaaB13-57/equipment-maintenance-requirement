@@ -79,8 +79,18 @@ const updateEquipment = async (req, res) => {
     res.json({ success: true, message: "Equipment updated successfully", data: normalizeEquipment(equipment) });
 };
 
+const deleteEquipment = async (req, res) => {
+    if (!isDbReady()) {
+        return res.status(503).json({ success: false, message: "The equipment database is unavailable" });
+    }
+    const equipment = await Equipment.findOneAndDelete({ assetId: req.params.id });
+    if (!equipment) return res.status(404).json({ success: false, message: "Equipment not found" });
+    res.json({ success: true, message: "Equipment deleted successfully" });
+};
+
 module.exports = {
     getEquipmentPage,
     addEquipment,
-    updateEquipment
+    updateEquipment,
+    deleteEquipment
 };

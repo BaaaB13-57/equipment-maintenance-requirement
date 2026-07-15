@@ -29,6 +29,8 @@ let adminUsers = [
 
 let technicians = ['Technician Account'];
 let activeReviewId = '';
+let editingUserId = '';
+let editingEquipmentId = '';
 
 async function loadAdminData() {
     try {
@@ -123,6 +125,8 @@ function renderAdminRequests() {
             <td>
                 <button type="button" class="admin-action-button" data-review-request="${request.requestId || request.id}">Review</button>
                 ${request.status === 'pending' ? `<button type="button" class="admin-action-button" data-approve-request="${request.requestId || request.id}">Approve</button>` : ''}
+                ${request.status === 'pending' ? `<button type="button" class="admin-action-button danger" data-open-reject-request="${request.requestId || request.id}">Reject</button>` : ''}
+                ${['pending', 'approved'].includes(request.status) ? `<button type="button" class="admin-action-button" data-open-assign-request="${request.requestId || request.id}">Assign Technician</button>` : ''}
             </td>
         </tr>
     `).join('');
@@ -132,23 +136,24 @@ function renderAdminReview() {
     const select = document.getElementById('adminReviewSelect');
     const panel = document.getElementById('adminReviewPanel');
     const request = getActiveReviewRequest();
-    if (!select || !panel) return;
+    if (!panel) return;
 
     if (!adminRequests.length) {
-        select.innerHTML = '<option>No requests available</option>';
+        if (select) select.innerHTML = '<option>No requests available</option>';
         panel.innerHTML = '<div class="technician-problem-box"><h3>No requests</h3><p>Maintenance requests submitted by users will appear here for admin review.</p></div>';
         return;
     }
 
-    select.innerHTML = adminRequests.map(item => {
-        const id = item.requestId || item.id;
-        return `<option value="${id}" ${id === activeReviewId ? 'selected' : ''}>${id} - ${item.equipment}</option>`;
-    }).join('');
-
-    select.onchange = () => {
-        activeReviewId = select.value;
-        renderAdminReview();
-    };
+    if (select) {
+        select.innerHTML = adminRequests.map(item => {
+            const id = item.requestId || item.id;
+            return `<option value="${id}" ${id === activeReviewId ? 'selected' : ''}>${id} - ${item.equipment}</option>`;
+        }).join('');
+        select.onchange = () => {
+            activeReviewId = select.value;
+            renderAdminReview();
+        };
+    }
 
     if (!request) return;
 
@@ -169,14 +174,19 @@ function renderAdminReview() {
             <p>${request.description || 'No problem description provided.'}</p>
             ${request.photoName ? `<p><strong>Uploaded Photo:</strong> ${request.photoName}</p>` : ''}
         </div>
+        ${request.rejectionReason ? `<div class="technician-problem-box admin-rejection-result"><h3>Recorded Rejection Reason</h3><p>${escapeHtml(request.rejectionReason)}</p></div>` : ''}
         <form class="maintenance-update-form" data-review-assignment-form="${requestId}">
             <label>Technician
                 <select>
                     ${technicians.map(name => `<option ${request.assignedTo === name ? 'selected' : ''}>${name}</option>`).join('')}
                 </select>
             </label>
+            <label>Rejection reason
+                <textarea rows="2" data-rejection-reason="${requestId}" placeholder="Required when rejecting a request">${escapeHtml(request.rejectionReason || '')}</textarea>
+            </label>
             <div class="equipment-form-actions">
                 <button type="button" class="btn btn-primary" data-approve-request="${requestId}">Approve Request</button>
+                <button type="button" class="btn btn-danger" data-reject-request="${requestId}">Reject Request</button>
                 <button type="submit" class="btn btn-success">Assign Technician</button>
             </div>
         </form>
@@ -250,8 +260,13 @@ function renderEquipment() {
             <td>${equipment.name}</td>
             <td>${equipment.location}</td>
             <td><span class="status-pill ${equipment.status.toLowerCase()}">${equipment.status}</span></td>
-            <td>${formatDate(equipment.lastService || equipment.lastServiced)}</td>
-            <td><button type="button" class="admin-action-button" data-equipment-index="${index}">Update</button></td>
+            <td>
+                <div class="admin-row-actions">
+                    <button type="button" class="admin-action-button" data-equipment-toggle-index="${index}">Status</button>
+                    <button type="button" class="admin-action-button" data-equipment-edit-index="${index}">Edit</button>
+                    <button type="button" class="admin-action-button danger" data-equipment-delete-index="${index}">Delete</button>
+                </div>
+            </td>
         </tr>
     `).join('');
 }
@@ -266,7 +281,12 @@ function renderUsers() {
             <td>${user.email}</td>
             <td>${user.role}</td>
             <td><span class="status-pill ${user.status.toLowerCase()}">${user.status}</span></td>
-            <td><button type="button" class="admin-action-button" data-user-index="${index}">Toggle</button></td>
+            <td>
+                <div class="admin-row-actions">
+                    <button type="button" class="admin-action-button" data-user-edit-index="${index}">Edit</button>
+                    <button type="button" class="admin-action-button danger" data-user-delete-index="${index}">Delete</button>
+                </div>
+            </td>
         </tr>
     `).join('');
 }
@@ -275,13 +295,35 @@ function setupAdminActions() {
     document.addEventListener('click', async (event) => {
         const reviewId = event.target.dataset.reviewRequest;
         const approveId = event.target.dataset.approveRequest;
-        const equipmentIndex = event.target.dataset.equipmentIndex;
-        const userIndex = event.target.dataset.userIndex;
+        const rejectId = event.target.dataset.rejectRequest;
+        const openRejectId = event.target.dataset.openRejectRequest;
+        const openAssignId = event.target.dataset.openAssignRequest;
+        const messageId = event.target.dataset.sendRequestMessage;
+        const equipmentToggleIndex = event.target.dataset.equipmentToggleIndex;
+        const equipmentEditIndex = event.target.dataset.equipmentEditIndex;
+        const equipmentDeleteIndex = event.target.dataset.equipmentDeleteIndex;
+        const userToggleIndex = event.target.dataset.userToggleIndex;
+        const userEditIndex = event.target.dataset.userEditIndex;
+        const userDeleteIndex = event.target.dataset.userDeleteIndex;
 
         if (reviewId) {
             activeReviewId = reviewId;
             renderAdminReview();
             showAdminSection('adminReview');
+        }
+
+        if (openRejectId) {
+            activeReviewId = openRejectId;
+            renderAdminReview();
+            showAdminSection('adminReview');
+            document.querySelector(`[data-rejection-reason="${openRejectId}"]`)?.focus();
+        }
+
+        if (openAssignId) {
+            activeReviewId = openAssignId;
+            renderAdminReview();
+            showAdminSection('adminReview');
+            document.querySelector(`[data-review-assignment-form="${openAssignId}"] select`)?.focus();
         }
 
         if (approveId) {
@@ -293,8 +335,37 @@ function setupAdminActions() {
             showNotification(`${approveId} approved`, 'success');
         }
 
-        if (equipmentIndex) {
-            const equipment = adminEquipment[Number(equipmentIndex)];
+        if (rejectId) {
+            const reason = document.querySelector(`[data-rejection-reason="${rejectId}"]`)?.value.trim();
+            if (!reason) {
+                showNotification('Enter a rejection reason first', 'warning');
+                return;
+            }
+            const confirmed = await showConfirmPopup(`Reject ${rejectId}? The requester will be notified with your reason.`, 'Reject');
+            if (!confirmed) return;
+            const request = findAdminRequest(rejectId);
+            const saved = await updateRequestApi(rejectId, { status: 'rejected', rejectionReason: reason });
+            if (!saved) return;
+            if (request) Object.assign(request, saved.data || { status: 'rejected', rejectionReason: reason });
+            renderAdminDashboard();
+            showNotification(`${rejectId} rejected`, 'warning');
+        }
+
+        if (messageId) {
+            const input = document.querySelector(`[data-admin-message="${messageId}"]`);
+            const message = input?.value.trim();
+            if (!message) {
+                showNotification('Enter a message first', 'warning');
+                return;
+            }
+            const saved = await updateRequestApi(messageId, { note: message, notifyUser: true });
+            if (!saved) return;
+            input.value = '';
+            showNotification('Message sent to requester', 'success');
+        }
+
+        if (equipmentToggleIndex !== undefined) {
+            const equipment = adminEquipment[Number(equipmentToggleIndex)];
             const nextStatus = ['Available', 'operational'].includes(equipment.status) ? 'maintenance' : 'operational';
             const saved = await updateEquipmentApi(equipment.id || equipment.assetId, { status: nextStatus });
             if (!saved) return;
@@ -303,14 +374,40 @@ function setupAdminActions() {
             showNotification(`${equipment.name} updated`, 'success');
         }
 
-        if (userIndex) {
-            const user = adminUsers[Number(userIndex)];
+        if (equipmentEditIndex !== undefined) beginEditEquipment(Number(equipmentEditIndex));
+
+        if (equipmentDeleteIndex !== undefined) {
+            const equipment = adminEquipment[Number(equipmentDeleteIndex)];
+            const confirmed = await showConfirmPopup(`Delete ${equipment.name}? This cannot be undone.`);
+            if (!confirmed) return;
+            const deleted = await deleteEquipmentApi(equipment.assetId || equipment.id);
+            if (!deleted) return;
+            adminEquipment.splice(Number(equipmentDeleteIndex), 1);
+            renderAdminDashboard();
+            showNotification('Equipment deleted successfully', 'success');
+        }
+
+        if (userToggleIndex !== undefined) {
+            const user = adminUsers[Number(userToggleIndex)];
             const nextStatus = user.status === 'Active' ? 'Inactive' : 'Active';
             const saved = await updateUserApi(user.email || user.username, { status: nextStatus });
             if (!saved) return;
             user.status = nextStatus;
             renderAdminDashboard();
             showNotification(`${user.name} status updated`, 'success');
+        }
+
+        if (userEditIndex !== undefined) beginEditUser(Number(userEditIndex));
+
+        if (userDeleteIndex !== undefined) {
+            const user = adminUsers[Number(userDeleteIndex)];
+            const confirmed = await showConfirmPopup(`Delete ${user.name}? This cannot be undone.`);
+            if (!confirmed) return;
+            const deleted = await deleteUserApi(user.email || user.username);
+            if (!deleted) return;
+            adminUsers.splice(Number(userDeleteIndex), 1);
+            renderAdminDashboard();
+            showNotification('User deleted successfully', 'success');
         }
     });
 
@@ -332,10 +429,12 @@ function setupAdminActions() {
     });
 
     document.getElementById('addEquipmentBtn')?.addEventListener('click', () => {
+        resetEquipmentFormMode();
         toggleAddEquipmentForm(true);
     });
 
     document.getElementById('cancelAddEquipmentBtn')?.addEventListener('click', () => {
+        resetEquipmentFormMode();
         toggleAddEquipmentForm(false);
     });
 
@@ -345,10 +444,12 @@ function setupAdminActions() {
     });
 
     document.getElementById('addUserBtn')?.addEventListener('click', () => {
+        resetUserFormMode();
         toggleAddUserForm(true);
     });
 
     document.getElementById('cancelAddUserBtn')?.addEventListener('click', () => {
+        resetUserFormMode();
         toggleAddUserForm(false);
     });
 
@@ -413,6 +514,19 @@ async function createEquipmentApi(payload) {
     }
 }
 
+async function deleteEquipmentApi(id) {
+    try {
+        const response = await fetch(`/equipment/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Equipment delete failed');
+        return data;
+    } catch (error) {
+        console.error('Equipment delete failed:', error);
+        showNotification(error.message || 'Equipment delete failed', 'error');
+        return null;
+    }
+}
+
 async function updateUserApi(id, payload) {
     try {
         const response = await fetch(`/users/${encodeURIComponent(id)}`, {
@@ -432,7 +546,7 @@ async function updateUserApi(id, payload) {
 
 async function createUserApi(payload) {
     try {
-        const response = await fetch('/users/register', {
+        const response = await fetch('/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -443,6 +557,19 @@ async function createUserApi(payload) {
     } catch (error) {
         console.error('User create failed:', error);
         showNotification(error.message || 'User save failed', 'error');
+        return null;
+    }
+}
+
+async function deleteUserApi(id) {
+    try {
+        const response = await fetch(`/users/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'User delete failed');
+        return data;
+    } catch (error) {
+        console.error('User delete failed:', error);
+        showNotification(error.message || 'User delete failed', 'error');
         return null;
     }
 }
@@ -563,6 +690,30 @@ function toggleAddEquipmentForm(show) {
     if (show) document.getElementById('equipmentAssetId')?.focus();
 }
 
+function beginEditEquipment(index) {
+    const equipment = adminEquipment[index];
+    if (!equipment) return;
+    editingEquipmentId = equipment.assetId || equipment.id;
+    document.getElementById('equipmentAssetId').value = equipment.assetId || equipment.id || '';
+    document.getElementById('equipmentName').value = equipment.name || '';
+    document.getElementById('equipmentType').value = equipment.type || '';
+    document.getElementById('equipmentLocation').value = equipment.location || '';
+    document.getElementById('equipmentStatus').value = equipment.status || 'operational';
+    document.getElementById('equipmentAssignedTo').value = equipment.assignedTo || 'Unassigned';
+    document.getElementById('equipmentNotes').value = equipment.notes || '';
+    const submitButton = document.querySelector('#addEquipmentForm button[type="submit"]');
+    if (submitButton) submitButton.textContent = 'Update Equipment';
+    toggleAddEquipmentForm(true);
+}
+
+function resetEquipmentFormMode() {
+    editingEquipmentId = '';
+    const form = document.getElementById('addEquipmentForm');
+    form?.reset();
+    const submitButton = form?.querySelector('button[type="submit"]');
+    if (submitButton) submitButton.textContent = 'Save Equipment';
+}
+
 async function saveNewEquipment() {
     const payload = {
         assetId: document.getElementById('equipmentAssetId').value.trim(),
@@ -579,14 +730,17 @@ async function saveNewEquipment() {
         return;
     }
 
-    const savedEquipment = await createEquipmentApi(payload);
+    const wasEditing = Boolean(editingEquipmentId);
+    const savedEquipment = editingEquipmentId
+        ? (await updateEquipmentApi(editingEquipmentId, payload))?.data
+        : await createEquipmentApi(payload);
     if (!savedEquipment) return;
 
-    adminEquipment.unshift(savedEquipment);
-    document.getElementById('addEquipmentForm').reset();
+    await loadAdminData();
+    resetEquipmentFormMode();
     toggleAddEquipmentForm(false);
     renderAdminDashboard();
-    showNotification('Equipment added successfully', 'success');
+    showNotification(wasEditing ? 'Equipment updated successfully' : 'Equipment added successfully', 'success');
 }
 
 function toggleAddUserForm(show) {
@@ -594,6 +748,37 @@ function toggleAddUserForm(show) {
     if (!form) return;
     form.classList.toggle('hidden', !show);
     if (show) document.getElementById('newUserName')?.focus();
+}
+
+function beginEditUser(index) {
+    const user = adminUsers[index];
+    if (!user) return;
+    editingUserId = user.email || user.username;
+    document.getElementById('newUserName').value = user.name || '';
+    document.getElementById('newUserEmail').value = user.email || '';
+    document.getElementById('newUsername').value = user.username || '';
+    document.getElementById('newUserPassword').value = '';
+    document.getElementById('newUserPassword').required = false;
+    document.getElementById('newUserPassword').placeholder = 'Leave blank to keep current password';
+    document.getElementById('newUserRole').value = user.role || 'user';
+    document.getElementById('newUserDepartment').value = user.department || 'Operations';
+    document.getElementById('newUserPhone').value = user.phone || '';
+    const submitButton = document.querySelector('#addUserForm button[type="submit"]');
+    if (submitButton) submitButton.textContent = 'Update User';
+    toggleAddUserForm(true);
+}
+
+function resetUserFormMode() {
+    editingUserId = '';
+    const form = document.getElementById('addUserForm');
+    form?.reset();
+    const password = document.getElementById('newUserPassword');
+    if (password) {
+        password.required = true;
+        password.placeholder = 'Create password';
+    }
+    const submitButton = form?.querySelector('button[type="submit"]');
+    if (submitButton) submitButton.textContent = 'Save User';
 }
 
 async function saveNewUser() {
@@ -610,7 +795,7 @@ async function saveNewUser() {
         phone: document.getElementById('newUserPhone').value.trim()
     };
 
-    if (!payload.name || !payload.email || !payload.username || !payload.password) {
+    if (!payload.name || !payload.email || !payload.username || (!editingUserId && !payload.password)) {
         showNotification('Please fill all required user fields', 'error');
         return;
     }
@@ -625,7 +810,10 @@ async function saveNewUser() {
         submitButton.textContent = 'Saving...';
     }
 
-    const savedUser = await createUserApi(payload);
+    if (!payload.password) delete payload.password;
+    const savedUser = editingUserId
+        ? (await updateUserApi(editingUserId, payload))?.user
+        : await createUserApi(payload);
     if (!savedUser) {
         if (submitButton) {
             submitButton.disabled = false;
@@ -635,13 +823,13 @@ async function saveNewUser() {
     }
 
     await loadAdminData();
-    form.reset();
-    document.getElementById('newUserDepartment').value = 'Operations';
+    const wasEditing = Boolean(editingUserId);
+    resetUserFormMode();
     toggleAddUserForm(false);
     renderAdminDashboard();
     if (submitButton) {
         submitButton.disabled = false;
-        submitButton.textContent = originalText;
+        submitButton.textContent = 'Save User';
     }
-    showNotification('User added successfully', 'success');
+    showNotification(wasEditing ? 'User updated successfully' : 'User added successfully', 'success');
 }

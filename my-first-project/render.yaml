@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: minekeep
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: SEED_DATABASE
+        value: "false"

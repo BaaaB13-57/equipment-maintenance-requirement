@@ -15,7 +15,8 @@ const connectDB = async () => {
       serverSelectionTimeoutMS: 5000,
       autoIndex: true,
     });
-    await seedDatabase();
+    const shouldSeed = process.env.SEED_DATABASE === "true" || process.env.NODE_ENV !== "production";
+    if (shouldSeed) await seedDatabase();
     console.log("MongoDB connected successfully");
     return true;
   } catch (error) {

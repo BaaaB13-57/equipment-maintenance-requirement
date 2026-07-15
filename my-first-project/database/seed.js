@@ -1,6 +1,5 @@
 const User = require("../models/User");
 const Equipment = require("../models/Equipment");
-const MaintenanceRequest = require("../models/MaintenanceRequest");
 
 const seedDatabase = async () => {
   await User.bulkWrite(
@@ -80,55 +79,6 @@ const seedDatabase = async () => {
             notes: "Seeded equipment record"
           }
         },
-        upsert: true
-      }
-    }))
-  );
-
-  await MaintenanceRequest.bulkWrite(
-    [
-      {
-        requestId: "MR-2026-001",
-        equipment: "Drill Machine #01",
-        type: "Oil Change",
-        dueDate: "2026-07-15",
-        priority: "high",
-        status: "in-progress",
-        assignedTo: "Technician Account",
-        requesterName: "User Account",
-        requesterEmail: "user@minekeeper.com",
-        description: "Replace oil and inspect drill head vibration."
-      },
-      {
-        requestId: "MR-2026-002",
-        equipment: "Excavator #05",
-        type: "Routine Check",
-        dueDate: "2026-07-18",
-        priority: "medium",
-        status: "pending",
-        assignedTo: "Unassigned",
-        requesterName: "User Account",
-        requesterEmail: "user@minekeeper.com",
-        description: "Routine hydraulic and bucket inspection."
-      },
-      {
-        requestId: "MR-2026-003",
-        equipment: "Crusher Unit #03",
-        type: "Belt Inspection",
-        dueDate: "2026-07-20",
-        priority: "low",
-        status: "completed",
-        assignedTo: "Technician Account",
-        requesterName: "Operations Team",
-        requesterEmail: "user@minekeeper.com",
-        description: "Inspect conveyor belt alignment and wear.",
-        completedDate: "2026-07-08",
-        repairSummary: "Belt alignment completed and tested."
-      }
-    ].map(request => ({
-      updateOne: {
-        filter: { requestId: request.requestId },
-        update: { $setOnInsert: request },
         upsert: true
       }
     }))

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { requireRole } = require('../middleware/auth');
 const {
     getAllRequests,
     getRequestById,
@@ -11,12 +12,12 @@ const {
 router.get("/", getAllRequests);
 
 // Create request API
-router.post("/", createRequest);
+router.post("/", requireRole('user'), createRequest);
 
 // View single request
 router.get("/:id", getRequestById);
 
 // Update request status or technician
-router.patch("/:id", updateRequest);
+router.patch("/:id", requireRole('admin', 'technician'), updateRequest);
 
 module.exports = router;

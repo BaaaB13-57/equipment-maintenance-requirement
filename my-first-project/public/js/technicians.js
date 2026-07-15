@@ -61,7 +61,12 @@ async function loadTechnicianJobs() {
             return assignedTo && assignedTo !== 'Unassigned';
         });
 
-        technicianJobs = requests.map(mapRequestToJob);
+        technicianJobs = Array.from(
+            new Map(requests.map(request => {
+                const job = mapRequestToJob(request);
+                return [job.id, job];
+            })).values()
+        );
         if (technicianJobs.length) {
             activeJobId = technicianJobs.find(job => job.status !== 'completed')?.id || technicianJobs[0].id;
         } else {
@@ -96,7 +101,9 @@ function mapRequestToJob(request) {
         parts: request.partsUsed || '',
         repairSummary: request.repairSummary || '',
         completedDate: request.completedDate || '',
-        photoName: request.photoName || ''
+        photoName: request.photoName || '',
+        repairPhotoName: request.repairPhotoName || '',
+        repairPhotoData: request.repairPhotoData || ''
     };
 }
 
@@ -169,7 +176,7 @@ function renderAssignedJobs() {
     }
 
     list.innerHTML = openJobs.map(job => `
-        <article class="maintenance-work-card">
+        <article class="maintenance-work-card ${job.id === activeJobId ? 'notification-assignment-target' : ''}" data-assigned-job-id="${job.id}">
             <div class="maintenance-work-info">
                 <span class="request-code">${job.id}</span>
                 <h3>${job.equipment}</h3>
@@ -222,8 +229,10 @@ function renderRequestSelector() {
     const select = document.getElementById('technicianRequestSelect');
     if (!select) return;
 
+    select.removeAttribute('multiple');
+    select.size = 1;
     select.innerHTML = technicianJobs.map(job => (
-        `<option value="${job.id}" ${job.id === activeJobId ? 'selected' : ''}>${job.id} - ${job.equipment}</option>`
+        `<option value="${job.id}" ${job.id === activeJobId ? 'selected' : ''}>${escapeTechnicianText(job.id)} - ${escapeTechnicianText(job.equipment)}: ${escapeTechnicianText(truncateProblem(job.problem))}</option>`
     )).join('');
 
     if (!technicianJobs.length) {
@@ -235,6 +244,17 @@ function renderRequestSelector() {
     select.onchange = () => {
         setActiveJob(select.value);
     };
+}
+
+function truncateProblem(problem = '') {
+    const clean = String(problem).replace(/\s+/g, ' ').trim();
+    return clean.length > 48 ? `${clean.slice(0, 48)}…` : clean;
+}
+
+function escapeTechnicianText(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[character]);
 }
 
 function renderProblemDetails() {
@@ -293,11 +313,14 @@ function setupRepairForms() {
         if (!job) return;
 
         const nextStatus = document.getElementById('repairStatus').value;
+        const photo = await getRepairPhotoPayload();
+        if (photo === null) return;
         await saveJobUpdate(job, {
             status: nextStatus,
             partsUsed: document.getElementById('partsUsed').value.trim(),
             repairSummary: document.getElementById('repairAction').value.trim(),
-            note: `Status updated to ${formatStatus(nextStatus)}.`
+            note: `Status updated to ${formatStatus(nextStatus)}.`,
+            ...photo
         });
 
         renderTechnicianDashboard();
@@ -315,14 +338,14 @@ function setupRepairForms() {
         const job = getActiveJob();
 
         if (!note || !job) {
-            showNotification('Please add a repair note', 'warning');
+            showNotification('Please enter a message', 'warning');
             return;
         }
 
-        await saveJobUpdate(job, { note });
+        await saveJobUpdate(job, { note, notifyUser: true });
         noteInput.value = '';
         renderRepairNotes();
-        showNotification('Repair note added', 'success');
+        showNotification('Message sent to the user', 'success');
     });
 }
 
@@ -349,6 +372,7 @@ function renderCompletedWork() {
             <td>${job.id}</td>
             <td>${job.equipment}</td>
             <td>${job.repairSummary || 'Repair completed.'}</td>
+            <td>${job.repairPhotoData ? `<img class="completed-repair-photo" src="${job.repairPhotoData}" alt="Repaired ${job.equipment}">` : 'No photo'}</td>
             <td>${formatDate(job.completedDate || getToday())}</td>
         </tr>
     `).join('');
@@ -364,6 +388,19 @@ function setActiveJob(jobId) {
     activeJobId = jobId;
     renderTechnicianDashboard();
 }
+
+window.openTechnicianAssignmentFromNotification = requestId => {
+    if (!technicianJobs.some(job => job.id === requestId)) {
+        showNotification('This assignment is no longer in the active queue', 'warning');
+        showTechnicianSection('assignedRequests');
+        return;
+    }
+    setActiveJob(requestId);
+    showTechnicianSection('assignedRequests');
+    window.requestAnimationFrame(() => {
+        document.querySelector(`[data-assigned-job-id="${CSS.escape(requestId)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+};
 
 function setText(id, text) {
     const element = document.getElementById(id);
@@ -405,6 +442,8 @@ async function saveJobUpdate(job, payload) {
     job.status = nextStatus;
     if (payload.partsUsed !== undefined) job.parts = payload.partsUsed;
     if (payload.repairSummary !== undefined) job.repairSummary = payload.repairSummary;
+    if (payload.repairPhotoName !== undefined) job.repairPhotoName = payload.repairPhotoName;
+    if (payload.repairPhotoData !== undefined) job.repairPhotoData = payload.repairPhotoData;
     if (note) job.notes.unshift(note);
     if (nextStatus === 'completed') job.completedDate = getToday();
 
@@ -416,13 +455,33 @@ async function completeActiveJob() {
     const job = getActiveJob();
     if (!job) return;
 
+    const photo = await getRepairPhotoPayload();
+    if (photo === null) return;
     await saveJobUpdate(job, {
         status: 'completed',
         partsUsed: document.getElementById('partsUsed')?.value.trim() || job.parts,
         repairSummary: document.getElementById('repairAction')?.value.trim() || job.repairSummary || 'Repair completed and equipment tested.',
-        note: 'Work marked as completed.'
+        note: 'Work marked as completed.',
+        ...photo
     });
 
     showTechnicianSection('completedWork');
     showNotification(`${job.id} marked completed`, 'success');
+}
+
+async function getRepairPhotoPayload() {
+    const input = document.getElementById('repairPhoto');
+    const file = input?.files?.[0];
+    if (!file) return {};
+    if (file.size > 2 * 1024 * 1024) {
+        showNotification('Repair photo must be 2 MB or smaller', 'warning');
+        return null;
+    }
+    const repairPhotoData = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+    return { repairPhotoName: file.name, repairPhotoData };
 }

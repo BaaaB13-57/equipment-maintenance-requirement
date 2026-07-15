@@ -4,45 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Equipment Maintenance System</title>
-    <link rel="stylesheet" href="../css/common.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../css/departments.css">
+    <link rel="stylesheet" href="../css/common.css?v=20260714-popup-ui">
+    <link rel="stylesheet" href="../css/dashboard.css?v=20260715-user-color-theme">
+    <link rel="stylesheet" href="../css/departments.css?v=20260714-admin-crud">
 </head>
-<body>
+<body class="user-color-theme">
     <div class="dashboard-app">
-        <aside class="dashboard-sidebar">
-            <div class="sidebar-brand"><div class="brand-icon">AD</div><div class="brand-text"><h2>MineKeep</h2><p>Maintenance System</p></div></div>
+        <button type="button" class="sidebar-toggle" aria-label="Open navigation menu" aria-controls="dashboardSidebar" aria-expanded="false"><span></span><span></span><span></span></button>
+        <div class="sidebar-backdrop" aria-hidden="true"></div>
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-brand"><div class="brand-icon" aria-hidden="true">⚙</div><div class="brand-text"><h2>MineKeep</h2><p>Maintenance System</p></div></div>
             <nav class="sidebar-menu">
-                <a href="#allRequests" class="sidebar-link active" data-admin-section-link="allRequests"><span class="sidebar-icon">RQ</span><span>All Requests</span></a>
-                <a href="#adminReview" class="sidebar-link" data-admin-section-link="adminReview"><span class="sidebar-icon">RV</span><span>Review Work</span></a>
-                <a href="#assignTechnicians" class="sidebar-link" data-admin-section-link="assignTechnicians"><span class="sidebar-icon">OP</span><span>Open Jobs</span></a>
-                <a href="#manageEquipment" class="sidebar-link" data-admin-section-link="manageEquipment"><span class="sidebar-icon">EQ</span><span>Equipment</span></a>
-                <a href="#manageUsers" class="sidebar-link" data-admin-section-link="manageUsers"><span class="sidebar-icon">US</span><span>Users</span></a>
-                <a href="#reports" class="sidebar-link" data-admin-section-link="reports"><span class="sidebar-icon">RP</span><span>Reports</span></a>
+                <a href="#dashboard" class="sidebar-link active" data-admin-section-link="dashboard"><span class="sidebar-icon" aria-hidden="true">▦</span><span>Dashboard</span></a>
+                <a href="#allRequests" class="sidebar-link" data-admin-section-link="allRequests"><span class="sidebar-icon" aria-hidden="true">▤</span><span>All Requests</span></a>
+                <a href="#adminReview" class="sidebar-link" data-admin-section-link="adminReview"><span class="sidebar-icon" aria-hidden="true">✓</span><span>Assign Technician</span></a>
+                <a href="#manageEquipment" class="sidebar-link" data-admin-section-link="manageEquipment"><span class="sidebar-icon" aria-hidden="true">⚒</span><span>Equipment</span></a>
+                <a href="#manageUsers" class="sidebar-link" data-admin-section-link="manageUsers"><span class="sidebar-icon" aria-hidden="true">♟</span><span>Users</span></a>
             </nav>
-            <button class="sidebar-logout" id="logoutBtn"><span class="sidebar-icon">LO</span><span>Logout</span></button>
+            <button class="sidebar-logout" id="logoutBtn"><span class="sidebar-icon" aria-hidden="true">↪</span><span>Logout</span></button>
         </aside>
         <main class="dashboard-main">
             <header class="dashboard-header">
                 <div><h1>Admin Dashboard</h1><p class="dashboard-subtitle">Review requests, approve work, assign technicians, manage equipment and users, and view performance reports.</p></div>
                 <div class="header-tools admin-header-tools">
-                    <button type="button" class="user-menu-button active" data-admin-section="allRequests">All Requests</button>
-                    <button type="button" class="user-menu-button" data-admin-section="adminReview">Review Work</button>
-                    <button type="button" class="user-menu-button" data-admin-section="assignTechnicians">Open Jobs</button>
+                    <button type="button" class="user-menu-button" data-admin-section="allRequests">All Requests</button>
+                    <button type="button" class="user-menu-button" data-admin-section="adminReview">Assign Technician</button>
                     <button type="button" class="user-menu-button" data-admin-section="manageEquipment">Equipment</button>
                     <button type="button" class="user-menu-button" data-admin-section="manageUsers">Users</button>
-                    <button type="button" class="user-menu-button" data-admin-section="reports">Reports</button>
                 </div>
             </header>
 
-            <section class="stats-grid admin-summary" aria-label="Admin summary">
-                <article class="stat-card stat-pending"><div class="stat-card-icon">PN</div><div class="stat-card-body"><h3 class="stat-card-title">Pending Approval</h3><p class="stat-card-value" id="adminPendingCount">3</p><span class="stat-card-note">Requests waiting for admin action</span></div></article>
-                <article class="stat-card stat-equipment"><div class="stat-card-icon">OP</div><div class="stat-card-body"><h3 class="stat-card-title">Open Jobs</h3><p class="stat-card-value" id="adminAssignedCount">2</p><span class="stat-card-note">Requests not completed yet</span></div></article>
-                <article class="stat-card stat-completed"><div class="stat-card-icon">EQ</div><div class="stat-card-body"><h3 class="stat-card-title">Equipment</h3><p class="stat-card-value" id="adminEquipmentCount">0</p><span class="stat-card-note">Registered assets</span></div></article>
-                <article class="stat-card stat-users"><div class="stat-card-icon">US</div><div class="stat-card-body"><h3 class="stat-card-title">Users</h3><p class="stat-card-value" id="adminUserCount">0</p><span class="stat-card-note">Active accounts</span></div></article>
+            <section class="admin-dashboard-section active" id="dashboard" aria-label="Admin dashboard summary and reports">
+                <div class="stats-grid admin-summary">
+                    <article class="stat-card stat-pending"><div class="stat-card-icon">PN</div><div class="stat-card-body"><h3 class="stat-card-title">Pending Approval</h3><p class="stat-card-value" id="adminPendingCount">3</p><span class="stat-card-note">Requests waiting for admin action</span></div></article>
+                    <article class="stat-card stat-equipment"><div class="stat-card-icon">OP</div><div class="stat-card-body"><h3 class="stat-card-title">Open Jobs</h3><p class="stat-card-value" id="adminAssignedCount">2</p><span class="stat-card-note">Requests not completed yet</span></div></article>
+                    <article class="stat-card stat-completed"><div class="stat-card-icon">EQ</div><div class="stat-card-body"><h3 class="stat-card-title">Equipment</h3><p class="stat-card-value" id="adminEquipmentCount">0</p><span class="stat-card-note">Registered assets</span></div></article>
+                    <article class="stat-card stat-users"><div class="stat-card-icon">US</div><div class="stat-card-body"><h3 class="stat-card-title">Users</h3><p class="stat-card-value" id="adminUserCount">0</p><span class="stat-card-note">Active accounts</span></div></article>
+                </div>
+                <div class="operations-request-panel dashboard-report-panel" aria-label="Reports">
+                    <div class="panel-head"><h2>Reports</h2><button type="button" class="view-all-button" id="downloadReportBtn">Download Report</button></div>
+                    <div class="admin-report-grid">
+                        <article class="admin-report-card"><span>Completion Rate</span><strong>86%</strong><p>Maintenance requests completed this month.</p></article>
+                        <article class="admin-report-card"><span>Average Repair Time</span><strong>1.8 days</strong><p>Average time from approval to close.</p></article>
+                        <article class="admin-report-card"><span>High Priority</span><strong>5</strong><p>Urgent equipment issues still open.</p></article>
+                        <article class="admin-report-card"><span>Downtime Reduced</span><strong>14%</strong><p>Improvement compared with last month.</p></article>
+                    </div>
+                </div>
             </section>
 
-            <section class="operations-request-panel admin-dashboard-section active" id="allRequests" aria-label="All maintenance requests">
+            <section class="operations-request-panel admin-dashboard-section" id="allRequests" aria-label="All maintenance requests">
                 <div class="panel-head"><h2>All Requests</h2><span class="notification-badge" id="adminReviewBadge">Admin Review</span></div>
                 <div class="table-wrapper">
                     <table class="data-table admin-table">
@@ -52,10 +62,9 @@
                 </div>
             </section>
 
-            <section class="operations-request-panel admin-dashboard-section" id="adminReview" aria-label="Admin review work">
+            <section class="operations-request-panel admin-dashboard-section" id="adminReview" aria-label="Assign technician and review request">
                 <div class="panel-head">
-                    <h2>Admin Review Work</h2>
-                    <select id="adminReviewSelect" class="user-dashboard-select" aria-label="Select request to review"></select>
+                    <h2>Assign Technician</h2>
                 </div>
                 <div class="technician-detail-panel" id="adminReviewPanel"></div>
             </section>
@@ -120,7 +129,7 @@
                 </form>
                 <div class="table-wrapper">
                     <table class="data-table admin-table">
-                        <thead><tr><th>Equipment</th><th>Location</th><th>Status</th><th>Last Service</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Equipment</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
                         <tbody id="adminEquipmentBody"></tbody>
                     </table>
                 </div>
@@ -180,18 +189,9 @@
                 </div>
             </section>
 
-            <section class="operations-request-panel admin-dashboard-section" id="reports" aria-label="Reports">
-                <div class="panel-head"><h2>Reports</h2><button type="button" class="view-all-button" id="downloadReportBtn">Download Report</button></div>
-                <div class="admin-report-grid">
-                    <article class="admin-report-card"><span>Completion Rate</span><strong>86%</strong><p>Maintenance requests completed this month.</p></article>
-                    <article class="admin-report-card"><span>Average Repair Time</span><strong>1.8 days</strong><p>Average time from approval to close.</p></article>
-                    <article class="admin-report-card"><span>High Priority</span><strong>5</strong><p>Urgent equipment issues still open.</p></article>
-                    <article class="admin-report-card"><span>Downtime Reduced</span><strong>14%</strong><p>Improvement compared with last month.</p></article>
-                </div>
-            </section>
         </main>
     </div>
-    <script src="../js/common.js?v=20260713-system-check"></script>
-    <script src="../js/admin.js?v=20260713-system-check"></script>
+    <script src="../js/common.js?v=20260715-profile-manage-users-removed"></script>
+    <script src="../js/admin.js?v=20260715-user-toggle-removed"></script>
 </body>
 </html>

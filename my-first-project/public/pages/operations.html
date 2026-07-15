@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard - Equipment Maintenance System</title>
-    <link rel="stylesheet" href="../css/common.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../css/departments.css">
+    <link rel="stylesheet" href="../css/common.css?v=20260714-popup-ui">
+    <link rel="stylesheet" href="../css/dashboard.css?v=20260715-full-action-notifications">
+    <link rel="stylesheet" href="../css/departments.css?v=20260714-active-card">
 </head>
 <body>
     <div class="dashboard-app">
-        <aside class="dashboard-sidebar">
+        <button type="button" class="sidebar-toggle" aria-label="Open navigation menu" aria-controls="dashboardSidebar" aria-expanded="false"><span></span><span></span><span></span></button>
+        <div class="sidebar-backdrop" aria-hidden="true"></div>
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
             <div class="sidebar-brand">
-                <div class="brand-icon">OP</div>
+                <div class="brand-icon" aria-hidden="true">⛏</div>
                 <div class="brand-text">
                     <h2>MineKeep</h2>
                     <p>Maintenance System</p>
@@ -20,30 +22,22 @@
             </div>
 
             <nav class="sidebar-menu">
-                <a href="#sendRequest" class="sidebar-link active" data-user-section-link="sendRequest">
-                    <span class="sidebar-icon">SR</span>
+                <a href="#dashboard" class="sidebar-link active" data-user-section-link="dashboard">
+                    <span class="sidebar-icon" aria-hidden="true">▦</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#sendRequest" class="sidebar-link" data-user-section-link="sendRequest">
+                    <span class="sidebar-icon" aria-hidden="true">＋</span>
                     <span>Send Request</span>
                 </a>
                 <a href="#myRequests" class="sidebar-link" data-user-section-link="myRequests">
-                    <span class="sidebar-icon">RQ</span>
+                    <span class="sidebar-icon" aria-hidden="true">▤</span>
                     <span>My Requests</span>
-                </a>
-                <a href="#requestStatus" class="sidebar-link" data-user-section-link="requestStatus">
-                    <span class="sidebar-icon">ST</span>
-                    <span>Status</span>
-                </a>
-                <a href="#notifications" class="sidebar-link" data-user-section-link="notifications">
-                    <span class="sidebar-icon">NT</span>
-                    <span>Notifications</span>
-                </a>
-                <a href="#profile" class="sidebar-link" data-user-section-link="profile">
-                    <span class="sidebar-icon">PR</span>
-                    <span>Profile</span>
                 </a>
             </nav>
 
             <button class="sidebar-logout" id="logoutBtn">
-                <span class="sidebar-icon">LO</span>
+                <span class="sidebar-icon" aria-hidden="true">↪</span>
                 <span>Logout</span>
             </button>
         </aside>
@@ -55,42 +49,24 @@
                     <p class="dashboard-subtitle">Send maintenance requests, track progress, read notifications, and keep your profile updated.</p>
                 </div>
                 <div class="header-tools user-header-tools">
-                    <button type="button" class="user-menu-button active" data-user-section="sendRequest">Send Request</button>
+                    <button type="button" class="user-menu-button" data-user-section="sendRequest">Send Request</button>
                     <button type="button" class="user-menu-button" data-user-section="myRequests">My Requests</button>
-                    <button type="button" class="user-menu-button" data-user-section="requestStatus">Check Status</button>
-                    <button type="button" class="user-menu-button" data-user-section="notifications">Notifications</button>
-                    <button type="button" class="user-menu-button" data-user-section="profile">Profile</button>
                 </div>
             </header>
 
-            <section class="stats-grid operations-summary" aria-label="Operations overview">
-                <article class="stat-card stat-equipment">
-                    <div class="stat-card-icon" aria-hidden="true">EQ</div>
-                    <div class="stat-card-body">
-                        <h3 class="stat-card-title">Equipment Status</h3>
-                        <p class="stat-card-value">Daily</p>
-                        <span class="stat-card-note">Check working, idle, and maintenance equipment</span>
-                    </div>
-                </article>
-                <article class="stat-card stat-pending">
-                    <div class="stat-card-icon" aria-hidden="true">REP</div>
-                    <div class="stat-card-body">
-                        <h3 class="stat-card-title">Problem Reports</h3>
-                        <p class="stat-card-value">Fast</p>
-                        <span class="stat-card-note">Report machine issues clearly</span>
-                    </div>
-                </article>
-                <article class="stat-card stat-completed">
-                    <div class="stat-card-icon" aria-hidden="true">FIX</div>
-                    <div class="stat-card-body">
-                        <h3 class="stat-card-title">Maintenance Follow Up</h3>
-                        <p class="stat-card-value">Track</p>
-                        <span class="stat-card-note">Follow requests until equipment is fixed</span>
-                    </div>
-                </article>
+            <section class="user-dashboard-overview user-dashboard-section active" id="dashboard" aria-label="User dashboard overview">
+                <div class="stats-grid operations-summary user-summary-grid">
+                    <article class="stat-card stat-equipment"><div class="stat-card-icon" aria-hidden="true">ALL</div><div class="stat-card-body"><h3 class="stat-card-title">Total Requests</h3><p class="stat-card-value" id="userTotalRequestCount">0</p><span class="stat-card-note">All submitted requests</span></div></article>
+                    <article class="stat-card stat-pending"><div class="stat-card-icon" aria-hidden="true">PN</div><div class="stat-card-body"><h3 class="stat-card-title">Pending</h3><p class="stat-card-value" id="userPendingRequestCount">0</p><span class="stat-card-note">Waiting for review</span></div></article>
+                    <article class="stat-card stat-progress"><div class="stat-card-icon" aria-hidden="true">RUN</div><div class="stat-card-body"><h3 class="stat-card-title">In Progress</h3><p class="stat-card-value" id="userInProgressRequestCount">0</p><span class="stat-card-note">Assigned or under repair</span></div></article>
+                    <article class="stat-card stat-completed"><div class="stat-card-icon" aria-hidden="true">OK</div><div class="stat-card-body"><h3 class="stat-card-title">Completed</h3><p class="stat-card-value" id="userCompletedRequestCount">0</p><span class="stat-card-note">Repairs completed</span></div></article>
+                </div>
             </section>
 
-            <section class="operations-request-panel user-dashboard-section active" id="sendRequest" aria-label="Send maintenance request form">
+            <section class="operations-request-panel user-dashboard-section" id="sendRequest" aria-label="Send maintenance request form">
+                <div class="user-dashboard-welcome send-request-welcome">
+                    <div><span class="dashboard-kicker">Mine operations</span><h2>Report Equipment Maintenance</h2><p>Send equipment problems directly to the maintenance team for review and repair.</p></div>
+                </div>
                 <div class="panel-head">
                     <h2>Send Problem to Maintenance</h2>
                 </div>
@@ -185,95 +161,22 @@
                 </div>
             </section>
 
-            <section class="operations-request-panel user-dashboard-section" id="requestStatus" aria-label="Request status tracker">
-                <div class="panel-head">
-                    <h2>Check Status</h2>
-                    <select id="statusRequestSelect" class="user-dashboard-select" aria-label="Select request">
-                        <option value="">Select request</option>
-                    </select>
-                </div>
-                <div class="user-status-panel">
-                    <h3 id="statusTitle">Select a request to view progress</h3>
-                    <p id="statusDescription">Status details will appear here after you choose a request.</p>
-                    <div class="status-track">
-                        <span class="status-step" data-status-step="pending">Submitted</span>
-                        <span class="status-step" data-status-step="approved">Approved</span>
-                        <span class="status-step" data-status-step="in-progress">In Progress</span>
-                        <span class="status-step" data-status-step="completed">Completed</span>
-                    </div>
-                </div>
-            </section>
-
             <section class="operations-request-panel user-dashboard-section" id="notifications" aria-label="Notifications">
                 <div class="panel-head">
                     <h2>Notifications</h2>
-                    <span class="notification-badge" id="userNotificationCount">3 new</span>
+                    <div class="notification-panel-actions">
+                        <span class="notification-badge" id="userNotificationCount">0 unread</span>
+                        <button type="button" class="view-all-button" id="markAllNotificationsRead">Mark all read</button>
+                    </div>
                 </div>
-                <div class="notification-items" id="userNotificationList">
-                    <article class="notification-item">
-                        <div>
-                            <h3>Crusher Unit #03 update</h3>
-                            <p>Your request is now in progress with a technician assigned.</p>
-                        </div>
-                        <span>Today</span>
-                    </article>
-                    <article class="notification-item">
-                        <div>
-                            <h3>Drill Machine #01 completed</h3>
-                            <p>Maintenance marked your oil leak report as completed.</p>
-                        </div>
-                        <span>Yesterday</span>
-                    </article>
-                    <article class="notification-item">
-                        <div>
-                            <h3>New request received</h3>
-                            <p>Maintenance received your Excavator #05 hydraulic issue.</p>
-                        </div>
-                        <span>2 days ago</span>
-                    </article>
-                </div>
+                <div class="notification-items" id="userNotificationList" aria-live="polite"></div>
             </section>
 
-            <section class="operations-request-panel user-dashboard-section" id="profile" aria-label="User profile">
-                <div class="panel-head">
-                    <h2>Update Profile</h2>
-                </div>
-                <form class="operations-request-form" id="userProfileForm">
-                    <div class="form-row-grid">
-                        <div class="form-group">
-                            <label for="profileName">Full Name</label>
-                            <input id="profileName" type="text" value="User Account">
-                        </div>
-                        <div class="form-group">
-                            <label for="profileEmail">Email</label>
-                            <input id="profileEmail" type="email" value="user@minekeeper.com">
-                        </div>
-                    </div>
-                    <div class="form-row-grid">
-                        <div class="form-group">
-                            <label for="profileDepartment">Department</label>
-                            <select id="profileDepartment">
-                                <option>Operations</option>
-                                <option>Production</option>
-                                <option>Safety</option>
-                                <option>Warehouse</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="profilePhone">Phone</label>
-                            <input id="profilePhone" type="tel" placeholder="Enter phone number">
-                        </div>
-                    </div>
-                    <div class="equipment-form-actions">
-                        <button type="submit" class="btn btn-primary">Save Profile</button>
-                    </div>
-                </form>
-            </section>
 
         </main>
     </div>
 
-    <script src="../js/common.js?v=20260713-system-check"></script>
-    <script src="../js/operations.js?v=20260713-system-check"></script>
+    <script src="../js/common.js?v=20260715-profile-my-requests-removed"></script>
+    <script src="../js/operations.js?v=20260715-full-action-notifications"></script>
 </body>
 </html>

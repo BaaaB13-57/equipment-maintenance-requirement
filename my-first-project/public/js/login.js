@@ -2,7 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPasswordToggle();
     setupLoginForm();
     setupRememberMe();
+    showAuthorizationNotice();
 });
+
+function showAuthorizationNotice() {
+    const reason = new URLSearchParams(window.location.search).get('reason');
+    if (reason === 'unauthorized') {
+        showNotification('Not authorized. Please log in to access that dashboard.', 'error');
+        window.history.replaceState({}, '', window.location.pathname);
+    }
+}
 
 function setupPasswordToggle() {
     const togglePassword = document.getElementById('togglePassword');
