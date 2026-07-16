@@ -1,0 +1,7 @@
+[build]
+  publish = "my-first-project/public"
+
+[[redirects]]
+  from = "/"
+  to = "/pages/login.html"
+  status = 302
