@@ -3,6 +3,6 @@
 
 [[redirects]]
   from = "/*"
-  to = "https://minekeep-vfsm.onrender.comt"
+  to = "https://minekeep-vfsm.onrender.com/:splat"
   status = 200
   force = true
